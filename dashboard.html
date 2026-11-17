@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>GTA VI Twitch CCU forecast — practice dashboard</title>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 860px; margin: 24px auto; padding: 0 16px; color: #111; }
+  h1 { font-size: 22px; } h2 { font-size: 17px; margin-top: 28px; }
+  p, li { font-size: 14px; line-height: 1.5; }
+  table { border-collapse: collapse; font-size: 13px; margin: 12px 0; }
+  th, td { border: 1px solid #ccc; padding: 5px 9px; text-align: right; }
+  th:first-child, td:first-child { text-align: left; }
+  .note { background: #fff7e6; border-left: 4px solid #d97706; padding: 10px 12px; font-size: 13px; }
+  .legend span { display: inline-block; width: 18px; height: 3px; vertical-align: middle; margin-right: 4px; }
+  .muted { color: #555; font-size: 13px; }
+</style>
+</head>
+<body>
+<h1>GTA VI Twitch CCU forecast — practice dashboard</h1>
+<p>Entry for <b>gta6-twitch-ccu-forecast-01</b> (make.fun). The program forecasts
+Twitch concurrent viewers in the “Grand Theft Auto VI” category for hours 2–24
+of release day 2026-11-19 (UTC), as five quantiles an hour, from the hour-1
+print. Model: per-hour quadratic regression on ln(hour-1 print) plus the
+pre-launch baseline, fitted from the case's own comparables at run time.
+Full reasoning: <a href="MODEL.md">MODEL.md</a>.</p>
+
+<h2>Practice results (mean pinball loss, log scale)</h2>
+<table>
+<tr><th>Case</th><th>Hour-1 print</th><th>Loss</th><th>Typical miss</th><th>90% coverage</th></tr>
+<tr><td>Marvel's Wolverine (2026-09-15)</td><td>23,357</td><td>0.1311</td><td>19.6%</td><td>1.000</td></tr>
+<tr><td>Red Dead Redemption 2 (2018-10-26)</td><td>116,550</td><td>0.1430</td><td>26.8%</td><td>1.000</td></tr>
+<tr><td>God of War Ragnarök (2022-11-09)</td><td>269,517</td><td>0.1241</td><td>21.2%</td><td>1.000</td></tr>
+<tr><td>Marvel's Spider-Man 2 (2023-10-20)</td><td>119,087</td><td>0.1793</td><td>31.0%</td><td>0.783</td></tr>
+<tr><td><b>Mean</b></td><td></td><td><b>0.1444</b></td><td></td><td></td></tr>
+<tr><td>House persistence baseline</td><td></td><td>0.3871</td><td>82.8%</td><td>0.783</td></tr>
+</table>
+<p>Reproduce: <code>python3 evaluation/score.py --kit &lt;kit dir&gt;</code>.
+Answers are SullyGnome hourly category averages; all four extracted hour-1
+prints match the cases exactly.</p>
+
+<h2>Practice curves — actual (solid) vs forecast median (dashed)</h2>
+<p class="legend">
+<span style="background:#2563eb"></span> Wolverine &nbsp;
+<span style="background:#dc2626"></span> RDR2 &nbsp;
+<span style="background:#16a34a"></span> GoW Ragnarök &nbsp;
+<span style="background:#d97706"></span> Spider-Man 2
+</p>
+<svg width="760" height="320" viewBox="0 0 760 320" xmlns="http://www.w3.org/2000/svg">
+  <g stroke="#e5e5e5" stroke-width="1">
+    <line x1="54" y1="278" x2="748" y2="278"/><line x1="54" y1="174" x2="748" y2="174"/>
+    <line x1="54" y1="129" x2="748" y2="129"/><line x1="54" y1="85" x2="748" y2="85"/>
+    <line x1="54" y1="40" x2="748" y2="40"/>
+  </g>
+  <g font-size="11" fill="#555">
+    <text x="48" y="282" text-anchor="end">10k</text><text x="48" y="178" text-anchor="end">50k</text>
+    <text x="48" y="133" text-anchor="end">100k</text><text x="48" y="89" text-anchor="end">200k</text>
+    <text x="48" y="44" text-anchor="end">400k</text>
+    <text x="54" y="312" text-anchor="middle">h1</text><text x="205" y="312" text-anchor="middle">h6</text>
+    <text x="386" y="312" text-anchor="middle">h12</text><text x="567" y="312" text-anchor="middle">h18</text>
+    <text x="748" y="312" text-anchor="middle">h24</text>
+  </g>
+  <!-- Wolverine -->
+  <polyline fill="none" stroke="#2563eb" stroke-width="2" points="54,223 84,235 114,232 145,239 175,196 205,188 235,191 265,206 295,193 326,201 356,194 386,186 416,181 446,164 476,145 507,135 537,111 567,88 597,93 627,83 657,81 688,86 718,102 748,104"/>
+  <polyline fill="none" stroke="#2563eb" stroke-width="1.5" stroke-dasharray="5 3" points="84,226 114,233 145,228 175,209 205,198 235,194 265,184 295,182 326,182 356,178 386,170 416,158 446,149 476,135 507,121 537,116 567,108 597,100 627,96 657,92 688,96 718,103 748,108"/>
+  <!-- RDR2 -->
+  <polyline fill="none" stroke="#dc2626" stroke-width="2" points="54,120 84,128 114,129 145,140 175,102 205,93 235,98 265,104 295,110 326,117 356,118 386,109 416,97 446,86 476,75 507,67 537,52 567,45 597,54 627,61 657,63 688,68 718,77 748,87"/>
+  <polyline fill="none" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="5 3" points="84,122 114,133 145,135 175,124 205,117 235,119 265,117 295,121 326,126 356,125 386,121 416,113 446,106 476,98 507,92 537,87 567,83 597,77 627,75 657,73 688,76 718,81 748,86"/>
+  <!-- GoW Ragnarok -->
+  <polyline fill="none" stroke="#16a34a" stroke-width="2" points="54,66 84,78 114,105 145,107 175,101 205,63 235,65 265,68 295,86 326,89 356,88 386,102 416,92 446,79 476,65 507,56 537,44 567,35 597,33 627,31 657,33 688,35 718,38 748,43"/>
+  <polyline fill="none" stroke="#16a34a" stroke-width="1.5" stroke-dasharray="5 3" points="84,68 114,82 145,87 175,75 205,69 235,75 265,77 295,82 326,84 356,84 386,80 416,74 446,66 476,58 507,56 537,51 567,49 597,48 627,47 657,46 688,48 718,52 748,56"/>
+  <!-- Spider-Man 2 -->
+  <polyline fill="none" stroke="#d97706" stroke-width="2" points="54,118 84,144 114,172 145,174 175,97 205,105 235,115 265,124 295,134 326,141 356,151 386,183 416,154 446,129 476,112 507,97 537,93 567,77 597,70 627,73 657,68 688,67 718,70 748,80"/>
+  <polyline fill="none" stroke="#d97706" stroke-width="1.5" stroke-dasharray="5 3" points="84,121 114,132 145,136 175,130 205,125 235,126 265,124 295,129 326,133 356,132 386,128 416,119 446,113 476,106 507,99 537,94 567,89 597,83 627,81 657,79 688,82 718,86 748,93"/>
+</svg>
+<p class="muted">Log scale, viewers vs UTC hour of release day. The forecast median tracks
+the actual curve's dip (hours 2–4, before the US unlocks) and its climb to the
+evening peak; the worst miss is Spider-Man 2's midday collapse to 43,730 at
+hour 12, which no hour-1 signal could foresee.</p>
+
+<h2>Illustrative scenario — what the model says for GTA VI</h2>
+<div class="note"><b>Scenario, not a prediction of the real case:</b> hour-1 print
+assumed 600,000 viewers, pre-launch baseline 1,789 (the GTA VI category's mean
+over 2026-11-17, from its own hourly history). The real hour-1 print is
+unknown until 01:00 UTC on 2026-11-19; the program will fit from the real
+case file then. The table shows the model's shape for a big launch: a dip to
+~320k around hour 9, a peak of ~576k at hour 17, easing to ~468k at hour 24.</div>
+<table>
+<tr><th>Hour (UTC)</th><th>q05</th><th>q25</th><th>q50</th><th>q75</th><th>q95</th></tr>
+<tr><td>2 (01:00)</td><td>407,917</td><td>493,102</td><td>562,482</td><td>641,624</td><td>775,613</td></tr>
+<tr><td>3 (02:00)</td><td>289,835</td><td>369,207</td><td>436,754</td><td>516,658</td><td>658,146</td></tr>
+<tr><td>4 (03:00)</td><td>227,371</td><td>305,698</td><td>375,429</td><td>461,066</td><td>619,898</td></tr>
+<tr><td>5 (04:00)</td><td>254,721</td><td>336,101</td><td>407,424</td><td>493,882</td><td>651,670</td></tr>
+<tr><td>6 (05:00)</td><td>232,476</td><td>329,235</td><td>419,189</td><td>533,719</td><td>755,860</td></tr>
+<tr><td>7 (06:00)</td><td>184,194</td><td>275,672</td><td>364,710</td><td>482,506</td><td>722,139</td></tr>
+<tr><td>8 (07:00)</td><td>163,919</td><td>247,898</td><td>330,347</td><td>440,218</td><td>665,752</td></tr>
+<tr><td>9 (08:00)</td><td>154,799</td><td>237,467</td><td>319,593</td><td>430,122</td><td>659,822</td></tr>
+<tr><td>10 (09:00)</td><td>161,384</td><td>251,678</td><td>342,612</td><td>466,400</td><td>727,350</td></tr>
+<tr><td>11 (10:00)</td><td>163,881</td><td>253,384</td><td>342,881</td><td>463,989</td><td>717,394</td></tr>
+<tr><td>12 (11:00)</td><td>174,069</td><td>267,008</td><td>359,332</td><td>483,579</td><td>741,772</td></tr>
+<tr><td>13 (12:00)</td><td>196,981</td><td>295,433</td><td>391,427</td><td>518,611</td><td>777,816</td></tr>
+<tr><td>14 (13:00)</td><td>237,135</td><td>355,385</td><td>470,609</td><td>623,192</td><td>933,956</td></tr>
+<tr><td>15 (14:00)</td><td>268,943</td><td>399,275</td><td>525,282</td><td>691,056</td><td>1,025,945</td></tr>
+<tr><td>16 (15:00)</td><td>267,879</td><td>396,361</td><td>520,233</td><td>682,818</td><td>1,010,315</td></tr>
+<tr><td>17 (16:00)</td><td>294,015</td><td>437,200</td><td>575,818</td><td>758,388</td><td>1,127,721</td></tr>
+<tr><td>18 (17:00)</td><td>293,381</td><td>432,861</td><td>567,021</td><td>742,760</td><td>1,095,886</td></tr>
+<tr><td>19 (18:00)</td><td>294,096</td><td>425,456</td><td>549,756</td><td>710,369</td><td>1,027,662</td></tr>
+<tr><td>20 (19:00)</td><td>291,131</td><td>417,776</td><td>536,810</td><td>689,760</td><td>989,811</td></tr>
+<tr><td>21 (20:00)</td><td>298,940</td><td>423,270</td><td>538,833</td><td>685,948</td><td>971,237</td></tr>
+<tr><td>22 (21:00)</td><td>281,118</td><td>405,054</td><td>521,938</td><td>672,550</td><td>969,055</td></tr>
+<tr><td>23 (22:00)</td><td>291,517</td><td>401,915</td><td>502,278</td><td>627,702</td><td>865,413</td></tr>
+<tr><td>24 (23:00)</td><td>267,573</td><td>372,341</td><td>468,325</td><td>589,053</td><td>819,697</td></tr>
+</table>
+<p class="muted">Generated by running main.py on a synthetic case built from the
+p00 practice case with the game, hour-1 print and history replaced by the
+scenario above. The forecast table is reproducible from the program; the
+scenario's inputs are assumptions, stated here and in the case's notes.</p>
+</body>
+</html>
